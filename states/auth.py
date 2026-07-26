@@ -1,53 +1,81 @@
 import reflex as rx
+import sqlmodel
+from models.models import User
 
 class AuthState(rx.State):
     """
-    State (Backend) gérant l'authentification et l'inscription pour Simminya.
+    State gérant l'authentification, les inscriptions et la hiérarchie des rôles.
     """
-    # Champs pour l'inscription
+    # Champs pour l'inscription publique (Clients)
     reg_nom_prenom: str = ""
     reg_email: str = ""
     reg_password: str = ""
     reg_telephone: str = ""
     reg_error: str = ""
+    reg_success: str = ""
 
     # Champs pour la connexion
-    login_email: str = "" # Remplacé par l'email pour la connexion
+    login_email: str = ""
     login_password: str = ""
     login_error: str = ""
 
-    # Base de données simulée stockant les utilisateurs par email
-    # Format : { "email": {"password": "...", "nom_prenom": "...", "telephone": "..."} }
-    users_db: dict[str, dict] = {
-        "admin@simminya.com": {
-            "password": "password123",
-            "nom_prenom": "Administrateur Simminya",
-            "telephone": "+224000000000"
-        }
-    } 
-    
+    # Champs pour l'ajout d'un Admin (Réservé au Super Admin)
+    new_admin_nom: str = ""
+    new_admin_email: str = ""
+    new_admin_password: str = ""
+    new_admin_telephone: str = ""
+    admin_error: str = ""
+    admin_success: str = ""
+
+    # Session utilisateur connecté
     is_authenticated: bool = False
-    current_user: str = ""
+    current_user_name: str = ""
+    current_user_email: str = ""
+    current_user_role: str = ""  # "superadmin", "admin", ou "client"
+
+    def check_is_setup(self):
+        """
+        Optionnel : Si aucun utilisateur n'existe dans la base, 
+        le tout premier inscrit devient automatiquement Super Admin.
+        """
+        with rx.session() as session:
+            count = session.exec(sqlmodel.select(sqlmodel.func.count(User.id))).first()
+            return count == 0
 
     def register(self):
-        """Logique d'inscription d'un nouvel utilisateur avec tous les champs requis."""
+        """Inscription publique standard (crée un compte client par défaut, ou superadmin si la base est vide)."""
         if not self.reg_nom_prenom or not self.reg_email or not self.reg_password or not self.reg_telephone:
             self.reg_error = "Veuillez remplir tous les champs du formulaire."
+            self.reg_success = ""
             return
         
-        if self.reg_email in self.users_db:
-            self.reg_error = "Un compte existe déjà avec cet email."
-            return
+        with rx.session() as session:
+            existing_user = session.exec(
+                sqlmodel.select(User).where(User.email == self.reg_email)
+            ).first()
+
+            if existing_user:
+                self.reg_error = "Un compte existe déjà avec cet email."
+                self.reg_success = ""
+                return
+            
+            # Si c'est le tout premier utilisateur de la plateforme, il devient Super Admin
+            is_first = self.check_is_setup()
+            assigned_role = "superadmin" if is_first else "client"
+
+            new_user = User(
+                nom_prenom=self.reg_nom_prenom,
+                email=self.reg_email,
+                password=self.reg_password,  # Pensez à hasher en production
+                telephone=self.reg_telephone,
+                role=assigned_role
+            )
+            session.add(new_user)
+            session.commit()
         
-        # Enregistrement des informations de l'utilisateur
-        self.users_db[self.reg_email] = {
-            "password": self.reg_password,
-            "nom_prenom": self.reg_nom_prenom,
-            "telephone": self.reg_telephone
-        }
-        
-        # Réinitialisation et redirection vers la page de login
+        # Réinitialisation
         self.reg_error = ""
+        self.reg_success = "Compte créé avec succès ! Vous pouvez vous connecter."
         self.reg_nom_prenom = ""
         self.reg_email = ""
         self.reg_password = ""
@@ -56,19 +84,72 @@ class AuthState(rx.State):
         return rx.redirect("/login")
 
     def login(self):
-        """Logique de connexion basée sur l'email."""
-        if self.login_email in self.users_db and self.users_db[self.login_email]["password"] == self.login_password:
-            self.is_authenticated = True
-            self.current_user = self.users_db[self.login_email]["nom_prenom"]
-            self.login_error = ""
-            self.login_email = ""
-            self.login_password = ""
-            return rx.redirect("/admin")
-        else:
-            self.login_error = "Email ou mot de passe incorrect."
+        """Connexion de l'utilisateur et stockage de son rôle en session."""
+        with rx.session() as session:
+            user = session.exec(
+                sqlmodel.select(User).where(User.email == self.login_email)
+            ).first()
+
+            if user and user.password == self.login_password:
+                self.is_authenticated = True
+                self.current_user_name = user.nom_prenom
+                self.current_user_email = user.email
+                self.current_user_role = user.role  # Stocke le rôle ("superadmin", "admin", "client")
+                self.login_error = ""
+                self.login_email = ""
+                self.login_password = ""
+                
+                # Redirection selon le rôle
+                if user.role in ["superadmin", "admin"]:
+                    return rx.redirect("/admin")
+                else:
+                    return rx.redirect("/")
+            else:
+                self.login_error = "Email ou mot de passe incorrect."
+
+    def create_admin_by_superadmin(self):
+        """Fonctionnalité accessible UNIQUEMENT par le Super Admin pour ajouter un nouvel Administrateur."""
+        if self.current_user_role != "superadmin":
+            self.admin_error = "Action non autorisée. Réservé au Super Administrateur."
+            self.admin_success = ""
+            return
+
+        if not self.new_admin_nom or not self.new_admin_email or not self.new_admin_password or not self.new_admin_telephone:
+            self.admin_error = "Veuillez remplir tous les champs pour créer l'administrateur."
+            self.admin_success = ""
+            return
+
+        with rx.session() as session:
+            existing = session.exec(
+                sqlmodel.select(User).where(User.email == self.new_admin_email)
+            ).first()
+
+            if existing:
+                self.admin_error = "Cet email est déjà utilisé."
+                self.admin_success = ""
+                return
+
+            new_admin = User(
+                nom_prenom=self.new_admin_nom,
+                email=self.new_admin_email,
+                password=self.new_admin_password,
+                telephone=self.new_admin_telephone,
+                role="admin"  # Forcé au rôle "admin"
+            )
+            session.add(new_admin)
+            session.commit()
+
+        self.admin_error = ""
+        self.admin_success = f"L'administrateur {self.new_admin_nom} a été créé avec succès !"
+        self.new_admin_nom = ""
+        self.new_admin_email = ""
+        self.new_admin_password = ""
+        self.new_admin_telephone = ""
 
     def logout(self):
-        """Déconnexion de l'utilisateur."""
+        """Déconnexion complète."""
         self.is_authenticated = False
-        self.current_user = ""
+        self.current_user_name = ""
+        self.current_user_email = ""
+        self.current_user_role = ""
         return rx.redirect("/")
