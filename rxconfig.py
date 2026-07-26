@@ -9,7 +9,7 @@ config = rx.Config(
     db_url="sqlite:///reflex.db",
     backend_port=port,
     backend_host="0.0.0.0",
-    api_url="https://votre-app-render.onrender.com", # Remplacez par votre vraie URL Render
+    api_url="https://simminya-erpk.onrender.com", # Remplacez par votre vraie URL Render
     plugins=[
         rx.plugins.SitemapPlugin(),
         rx.plugins.TailwindV4Plugin(),
