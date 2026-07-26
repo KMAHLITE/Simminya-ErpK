@@ -3,7 +3,7 @@ import os
 
 config = rx.Config(
     app_name="simminya_erpk",
-    db_url=os.environ.get("DATABASE_URL"),
+    db_url="sqlite:///reflex.db"
     plugins=[
         rx.plugins.SitemapPlugin(),
         rx.plugins.TailwindV4Plugin(),
