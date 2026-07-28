@@ -12,12 +12,15 @@ from pages.register import register
 
 app = rx.App()
 
-# --- CRÉATION AUTOMATIQUE DES TABLES DANS POSTGRESQL AU DÉMARRAGE ---
-@app.on_load
-def create_tables_on_startup():
-    with rx.session() as session:
-        sqlmodel.SQLModel.metadata.create_all(session.bind)
-# -------------------------------------------------------------------
+# --- INITIALISATION DE LA BASE DE DONNÉES ---
+def init_db():
+    # Crée un moteur de base de données à partir de la configuration Reflex/SQLModel
+    engine = sqlmodel.create_engine(rx.get_db_engine_url())
+    sqlmodel.SQLModel.metadata.create_all(engine)
+
+# Exécution de la création des tables au lancement du script
+init_db()
+# ---------------------------------------------
 
 # Enregistrement des routes de l'application Simminya
 app.add_page(welcome, route="/", title="Simminya - Accueil")
