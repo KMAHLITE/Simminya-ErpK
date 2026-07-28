@@ -1,8 +1,7 @@
 import os
 import reflex as rx
-from dotenv import load_dotenv
 
-load_dotenv()
+
 
 port = int(os.environ.get("PORT", 10000))
 
