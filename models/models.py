@@ -1,10 +1,11 @@
-import reflex as rx
 import sqlmodel
+from typing import Optional
 
-class User(rx.Model, table=True):
-    """Modèle de table utilisateur pour PostgreSQL avec gestion des rôles."""
-    nom_prenom: str
+class User(sqlmodel.SQLModel, table=True):
+    id: Optional[int] = sqlmodel.Field(default=None, primary_key=True)
     email: str = sqlmodel.Field(index=True, unique=True)
-    password: str
-    telephone: str
+    password_hash: str
+    nom: str
+    prenom: str
+    telephone: Optional[str] = None
     role: str = "client"  # Valeurs possibles : "superadmin", "admin", "client"
