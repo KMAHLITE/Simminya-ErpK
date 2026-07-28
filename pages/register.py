@@ -21,22 +21,33 @@ def register() -> rx.Component:
                     rx.image(src="/logo.png", width="100px", height="80px"),
                     rx.heading("Inscription", size="7", color="#1a4d44", weight="light"),
                     
-                    # Affichage des erreurs d'inscription
+                    # Affichage des erreurs et succès d'inscription
                     rx.cond(
-                        AuthState.register_error != "",
-                        rx.text(AuthState.register_error, color="red", size="2")
+                        AuthState.reg_error != "",
+                        rx.text(AuthState.reg_error, color="red", size="2")
+                    ),
+                    rx.cond(
+                        AuthState.reg_success != "",
+                        rx.text(AuthState.reg_success, color="green", size="2")
                     ),
 
                     rx.input(
                         placeholder="Nom et Prénom", 
-                        on_change=AuthState.set_register_nom_prenom, 
+                        on_change=AuthState.set_reg_nom_prenom, 
                         width="100%", 
                         radius="full", 
                         background="rgba(255, 255, 255, 0.1)"
                     ),
                     rx.input(
                         placeholder="Email", 
-                        on_change=AuthState.set_register_email, 
+                        on_change=AuthState.set_reg_email, 
+                        width="100%", 
+                        radius="full", 
+                        background="rgba(255, 255, 255, 0.1)"
+                    ),
+                    rx.input(
+                        placeholder="Téléphone", 
+                        on_change=AuthState.set_reg_telephone, 
                         width="100%", 
                         radius="full", 
                         background="rgba(255, 255, 255, 0.1)"
@@ -45,7 +56,7 @@ def register() -> rx.Component:
                         rx.input(
                             placeholder="Mot de passe", 
                             type=rx.cond(AuthState.show_password, "text", "password"), 
-                            on_change=AuthState.set_register_password, 
+                            on_change=AuthState.set_reg_password, 
                             width="100%", 
                             radius="full", 
                             background="rgba(255, 255, 255, 0.1)"
@@ -60,7 +71,7 @@ def register() -> rx.Component:
                     ),
                     rx.button(
                         "S'inscrire", 
-                        on_click=AuthState.register_user, 
+                        on_click=AuthState.register, 
                         width="60%", 
                         radius="full", 
                         background="#1a4d44",
