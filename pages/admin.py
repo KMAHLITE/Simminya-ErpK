@@ -100,8 +100,10 @@ def admin_page():
                         rx.heading("SUIVI OPÉRATIONS", size="4"),
                         rx.text("AGRICULTURE", size="1", color="gray"),
                         rx.hstack(rx.icon("chevron-left"), rx.spacer(), rx.text("Saison en cours", weight="bold"), rx.spacer(), rx.icon("chevron-right"), width="100%", padding="5px", background="#f4f6f8", border_radius="8px"),
-                        rx.box(height="110px", background="#e8f5e9", border_radius="10px", width="100%", display="flex", align_items="center", justify_content="center", 
-                               child=rx.text("Rendement optimal", color="#1a4d44", weight="bold", size="2")),
+                        rx.box(
+                            rx.text("Rendement optimal", color="#1a4d44", weight="bold", size="2"),
+                            height="110px", background="#e8f5e9", border_radius="10px", width="100%", display="flex", align_items="center", justify_content="center"
+                        ),
                         rx.button("NOUVELLE OPÉRATION +", background="#1a4d44", color="white", width="100%", radius="full", font_weight="bold"),
                         width="100%", spacing="3"
                     ),
