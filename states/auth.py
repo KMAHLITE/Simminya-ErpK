@@ -19,6 +19,9 @@ class AuthState(rx.State):
     login_password: str = ""
     login_error: str = ""
 
+    # Gestion de la visibilité du mot de passe pour les formulaires
+    show_password: bool = False
+
     # Champs pour l'ajout d'un Admin (Réservé au Super Admin)
     new_admin_nom: str = ""
     new_admin_email: str = ""
@@ -33,6 +36,37 @@ class AuthState(rx.State):
     current_user_email: str = ""
     current_user_role: str = ""  # "superadmin", "admin", ou "client"
 
+    @rx.event
+    def toggle_password(self):
+        """Bascule la visibilité du mot de passe."""
+        self.show_password = not self.show_password
+
+    # Setters pour l'inscription
+    @rx.event
+    def set_reg_nom_prenom(self, value: str):
+        self.reg_nom_prenom = value
+
+    @rx.event
+    def set_reg_email(self, value: str):
+        self.reg_email = value
+
+    @rx.event
+    def set_reg_telephone(self, value: str):
+        self.reg_telephone = value
+
+    @rx.event
+    def set_reg_password(self, value: str):
+        self.reg_password = value
+
+    # Setters pour la connexion
+    @rx.event
+    def set_login_email(self, value: str):
+        self.login_email = value
+
+    @rx.event
+    def set_login_password(self, value: str):
+        self.login_password = value
+
     def check_is_setup(self):
         """
         Optionnel : Si aucun utilisateur n'existe dans la base, 
@@ -42,7 +76,8 @@ class AuthState(rx.State):
             count = session.exec(sqlmodel.select(sqlmodel.func.count(User.id))).first()
             return count == 0
 
-    def register(self):
+    @rx.event
+    async def register(self):
         """Inscription publique standard (crée un compte client par défaut, ou superadmin si la base est vide)."""
         if not self.reg_nom_prenom or not self.reg_email or not self.reg_password or not self.reg_telephone:
             self.reg_error = "Veuillez remplir tous les champs du formulaire."
@@ -66,7 +101,7 @@ class AuthState(rx.State):
             new_user = User(
                 nom_prenom=self.reg_nom_prenom,
                 email=self.reg_email,
-                password=self.reg_password,  # Pensez à hasher en production
+                password_hash=self.reg_password,  # Pensez à hasher en production
                 telephone=self.reg_telephone,
                 role=assigned_role
             )
@@ -83,14 +118,15 @@ class AuthState(rx.State):
         
         return rx.redirect("/login")
 
-    def login(self):
+    @rx.event
+    async def login(self):
         """Connexion de l'utilisateur et stockage de son rôle en session."""
         with rx.session() as session:
             user = session.exec(
                 sqlmodel.select(User).where(User.email == self.login_email)
             ).first()
 
-            if user and user.password == self.login_password:
+            if user and user.password_hash == self.login_password:
                 self.is_authenticated = True
                 self.current_user_name = user.nom_prenom
                 self.current_user_email = user.email
@@ -107,7 +143,8 @@ class AuthState(rx.State):
             else:
                 self.login_error = "Email ou mot de passe incorrect."
 
-    def create_admin_by_superadmin(self):
+    @rx.event
+    async def create_admin_by_superadmin(self):
         """Fonctionnalité accessible UNIQUEMENT par le Super Admin pour ajouter un nouvel Administrateur."""
         if self.current_user_role != "superadmin":
             self.admin_error = "Action non autorisée. Réservé au Super Administrateur."
@@ -132,7 +169,7 @@ class AuthState(rx.State):
             new_admin = User(
                 nom_prenom=self.new_admin_nom,
                 email=self.new_admin_email,
-                password=self.new_admin_password,
+                password_hash=self.new_admin_password,
                 telephone=self.new_admin_telephone,
                 role="admin"  # Forcé au rôle "admin"
             )

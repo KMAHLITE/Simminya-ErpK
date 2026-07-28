@@ -1,45 +1,5 @@
 import reflex as rx
-import httpx
-
-class RegisterState(rx.State):
-    email: str = ""
-    nom: str = ""
-    prenom: str = ""
-    telephone: str = ""
-    password: str = ""
-    show_password: bool = False
-
-    @rx.event
-    def set_email(self, value: str): self.email = value
-    @rx.event
-    def set_nom(self, value: str): self.nom = value
-    @rx.event
-    def set_prenom(self, value: str): self.prenom = value
-    @rx.event
-    def set_telephone(self, value: str): self.telephone = value
-    @rx.event
-    def set_password(self, value: str): self.password = value
-
-    def toggle_password(self):
-        self.show_password = not self.show_password
-
-    @rx.event
-    async def handle_register(self):
-        async with httpx.AsyncClient() as client:
-            try:
-                payload = {
-                    "email": self.email, 
-                    "nom": self.nom, 
-                    "prenom": self.prenom, 
-                    "telephone": self.telephone,
-                    "password": self.password
-                }
-                response = await client.post("http://localhost:8001/api/v1/auth/inscription", json=payload)
-                if response.status_code == 201:
-                    return rx.redirect("/admin")
-                return rx.window_alert(f"Erreur : {response.text}")
-            except Exception as e:
-                return rx.window_alert(f"Erreur : {str(e)}")
+from states.auth import AuthState  # Assurez-vous que le chemin d'import correspond à votre structure
 
 def register() -> rx.Component:
     return rx.box(
@@ -50,17 +10,27 @@ def register() -> rx.Component:
                 rx.vstack(
                     rx.image(src="/logo.png", width="100px", height="80px"),
                     rx.heading("Inscription", size="7", color="grass", weight="light"),
-                    rx.input(placeholder="Nom", on_change=RegisterState.set_nom, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
-                    rx.input(placeholder="Prénom", on_change=RegisterState.set_prenom, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
-                    rx.input(placeholder="Email", on_change=RegisterState.set_email, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
-                    rx.input(placeholder="Numéro de téléphone", on_change=RegisterState.set_telephone, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
+                    
+                    # Affichage des messages d'erreur ou de succès du AuthState
+                    rx.cond(
+                        AuthState.reg_error != "",
+                        rx.text(AuthState.reg_error, color="red", size="2")
+                    ),
+                    rx.cond(
+                        AuthState.reg_success != "",
+                        rx.text(AuthState.reg_success, color="green", size="2")
+                    ),
+
+                    rx.input(placeholder="Nom et Prénom", on_change=AuthState.set_reg_nom_prenom, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
+                    rx.input(placeholder="Email", on_change=AuthState.set_reg_email, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
+                    rx.input(placeholder="Numéro de téléphone", on_change=AuthState.set_reg_telephone, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
                     rx.hstack(
-                        rx.input(placeholder="Mot de passe", type=rx.cond(RegisterState.show_password, "text", "password"), 
-                                 on_change=RegisterState.set_password, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
-                        rx.icon(tag=rx.cond(RegisterState.show_password, "eye", "eye-off"), on_click=RegisterState.toggle_password, cursor="pointer", margin_left="-40px"),
+                        rx.input(placeholder="Mot de passe", type=rx.cond(AuthState.show_password, "text", "password"), 
+                                 on_change=AuthState.set_reg_password, width="100%", radius="full", background="rgba(255, 255, 255, 0.1)"),
+                        rx.icon(tag=rx.cond(AuthState.show_password, "eye", "eye-off"), on_click=AuthState.toggle_password, cursor="pointer", margin_left="-40px"),
                         width="100%", align="center"
                     ),
-                    rx.button("S'inscrire", on_click=RegisterState.handle_register, width="60%", radius="full", color_scheme="grass"),
+                    rx.button("S'inscrire", on_click=AuthState.register, width="60%", radius="full", color_scheme="grass"),
                     rx.text("Déjà un compte ? ", rx.link("Se connecter", href="/login", color="grass"), size="2"),
                     spacing="5", width="100%", align="center", padding="2em"
                 ),
