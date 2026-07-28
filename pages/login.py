@@ -1,8 +1,10 @@
 import reflex as rx
-from states.auth import AuthState  # Assurez-vous que l'import pointe vers votre AuthState
+from states.auth import AuthState
 
+@rx.page(route="/login", title="AGUIFERME - Connexion")
 def login() -> rx.Component:
     return rx.box(
+        # Arrière-plan avec image et effet visuel
         rx.box(
             position="absolute", 
             width="100vw", 
@@ -17,7 +19,7 @@ def login() -> rx.Component:
             rx.card(
                 rx.vstack(
                     rx.image(src="/logo.png", width="100px", height="80px"),
-                    rx.heading("Connexion", size="7", color="grass", weight="light"),
+                    rx.heading("Connexion", size="7", color="#1a4d44", weight="light"),
                     
                     # Affichage des erreurs de connexion du AuthState
                     rx.cond(
@@ -54,11 +56,12 @@ def login() -> rx.Component:
                         on_click=AuthState.login, 
                         width="60%", 
                         radius="full", 
-                        color_scheme="grass"
+                        background="#1a4d44",
+                        color="white"
                     ),
                     rx.text(
                         "Pas encore de compte ? ", 
-                        rx.link("S'inscrire", href="/register", color="grass"), 
+                        rx.link("S'inscrire", href="/register", color="#1a4d44", weight="bold"), 
                         size="2"
                     ),
                     spacing="5", 
@@ -67,8 +70,9 @@ def login() -> rx.Component:
                     padding="2em"
                 ),
                 width=["90%", "450px"], 
-                background="rgba(255, 255, 255, 0.1)", 
-                border_radius="30px"
+                background="rgba(255, 255, 255, 0.85)", 
+                border_radius="30px",
+                box_shadow="0 10px 25px rgba(0,0,0,0.15)"
             ),
             style={"backdrop_filter": "blur(3px)"},
             width="100vw", 
