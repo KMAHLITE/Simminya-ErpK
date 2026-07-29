@@ -56,7 +56,7 @@ def admin_page():
                 # Colonne 1 : Gestion Rapide des Prix & Catalogue
                 rx.card(
                     rx.vstack(
-                        rx.heading("TARIFS DU JOUR", size="4", margin_bottom="0.5em", weight="normal"),
+                        rx.heading("TARIFS DU JOUR", size="4", margin_bottom="0.5em", weight="regular"),
                         rx.input(placeholder="Rechercher un produit...", width="100%", radius="full", variant="surface"),
                         rx.hstack(
                             rx.text("Alvéole d'œufs (30 œufs)", size="2", weight="medium"),
