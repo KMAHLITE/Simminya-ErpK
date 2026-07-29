@@ -1,7 +1,7 @@
 import reflex as rx
 from states.auth import AuthState  # Assurez-vous d'importer votre AuthState
 
-@rx.page(route="/login", title="AGUIFERME - Connexion")
+@rx.page(route="/login", title="SIMMINYA - Connexion")
 def login() -> rx.Component:
     return rx.box(
         rx.box(position="absolute", width="100vw", height="100vh", z_index="0", 

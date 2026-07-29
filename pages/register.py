@@ -1,7 +1,7 @@
 import reflex as rx
 from states.auth import AuthState  # Assurez-vous d'importer votre AuthState
 
-@rx.page(route="/register", title="AGUIFERME - Inscription")
+@rx.page(route="/register", title="SIMMINYA - Inscription")
 def register() -> rx.Component:
     return rx.box(
         rx.box(position="absolute", width="100vw", height="100vh", z_index="0", 
