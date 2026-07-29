@@ -1,136 +1,110 @@
 import reflex as rx
-from components.layout import dashboard_layout
+import sqlmodel
+from models.models import User
 
-def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Component:
-    return rx.card(
-        rx.hstack(
-            rx.box(
-                rx.icon(tag=icon, color="#1a4d44", size=24),
-                background="#c8e6c9", padding="15px", border_radius="12px", 
-            ),
-            rx.vstack(
-                rx.text(value, size="5", weight="bold"),
-                rx.text(title, size="2", color="gray"),
-                align="start", spacing="0"
-            ),
-            rx.spacer(),
-            rx.badge(action_text, color_scheme="green", variant="soft", cursor="pointer"),
-            spacing="4", align="center"
-        ),
-        background="white", width="100%", border_radius="15px",
-        box_shadow="0 10px 20px rgba(0,0,0,0.15)", 
-        transition="transform 0.2s",
-        _hover={"transform": "translateY(-5px)"}
-    )
+class AuthState(rx.State):
+    reg_nom_prenom: str = ""
+    reg_email: str = ""
+    reg_password: str = ""
+    reg_telephone: str = ""
+    reg_error: str = ""
+    reg_success: str = ""
 
-def parcel_item(name: str, stock_info: str) -> rx.Component:
-    return rx.hstack(
-        rx.vstack(
-            rx.text(name, weight="medium", size="3"),
-            rx.text(stock_info, size="1", color="gray"),
-            spacing="0", align="start"
-        ),
-        rx.spacer(),
-        rx.icon("chevron-right", size=18, color="gray"),
-        width="100%", padding="12px", border_bottom="1px solid #f0f0f0",
-        _hover={"background": "#f9f9f9", "border_radius": "8px"}, cursor="pointer"
-    )
+    login_email: str = ""
+    login_password: str = ""
+    login_error: str = ""
 
-@rx.page(route="/admin")
-def admin_page():
-    return dashboard_layout(
-        rx.vstack(
-            rx.text("Tableau de bord - AGUIFERME", size="4", color="gray", weight="light"),
+    show_password: bool = False
+
+    is_authenticated: bool = False
+    current_user_name: str = ""
+    current_user_email: str = ""
+    current_user_role: str = ""
+
+    @rx.event
+    def toggle_password(self):
+        self.show_password = not self.show_password
+
+    @rx.event
+    def set_reg_nom_prenom(self, value: str):
+        self.reg_nom_prenom = value
+
+    @rx.event
+    def set_reg_email(self, value: str):
+        self.reg_email = value
+
+    @rx.event
+    def set_reg_telephone(self, value: str):
+        self.reg_telephone = value
+
+    @rx.event
+    def set_reg_password(self, value: str):
+        self.reg_password = value
+
+    @rx.event
+    def set_login_email(self, value: str):
+        self.login_email = value
+
+    @rx.event
+    def set_login_password(self, value: str):
+        self.login_password = value
+
+    def check_is_setup(self):
+        with rx.session() as session:
+            count = session.exec(sqlmodel.select(sqlmodel.func.count(User.id))).first()
+            return count == 0
+
+    @rx.event
+    async def register(self):
+        if not self.reg_nom_prenom or not self.reg_email or not self.reg_password or not self.reg_telephone:
+            self.reg_error = "Veuillez remplir tous les champs du formulaire."
+            self.reg_success = ""
+            return
+        
+        with rx.session() as session:
+            existing_user = session.exec(
+                sqlmodel.select(User).where(User.email == self.reg_email)
+            ).first()
+
+            if existing_user:
+                self.reg_error = "Un compte existe déjà avec cet email."
+                self.reg_success = ""
+                return
             
-            # Grille KPI adaptée aux œufs, légumes et commandes
-            rx.grid(
-                kpi_card("Alvéoles d'Œufs", "145 Alv.", "egg", "Gérer"),
-                kpi_card("Stock Légumes", "320 Kg", "carrot", "Prix"),
-                kpi_card("Commandes Clients", "8 en attente", "shopping-cart", "Traiter"),
-                kpi_card("Chiffre d'Affaires", "1.250.000 GNF", "trending-up", "Détails"),
-                columns="4", spacing="4", width="100%"
-            ),
-            
-            # Grille Centrale (Recherche/Catalogue + Parcelles + Suivi des Opérations)
-            rx.grid(
-                # Colonne 1 : Gestion Rapide des Prix & Catalogue
-                rx.card(
-                    rx.vstack(
-                        rx.heading("TARIFS DU JOUR", size="4", margin_bottom="0.5em", weight="light"),
-                        rx.input(placeholder="Rechercher un produit...", width="100%", radius="full", variant="surface"),
-                        rx.hstack(
-                            rx.text("Alvéole d'œufs (30 œufs)", size="2", weight="medium"),
-                            rx.spacer(),
-                            rx.badge("4.500 GNF", color_scheme="green", variant="solid"),
-                            width="100%", padding="8px 0", border_bottom="1px solid #f0f0f0"
-                        ),
-                        rx.hstack(
-                            rx.text("Tomate (1 kg)", size="2", weight="medium"),
-                            rx.spacer(),
-                            rx.badge("8.000 GNF", color_scheme="green", variant="solid"),
-                            width="100%", padding="8px 0", border_bottom="1px solid #f0f0f0"
-                        ),
-                        rx.hstack(
-                            rx.text("Piment (1 kg)", size="2", weight="medium"),
-                            rx.spacer(),
-                            rx.badge("15.000 GNF", color_scheme="green", variant="solid"),
-                            width="100%", padding="8px 0"
-                        ),
-                        width="100%", spacing="3"
-                    ),
-                    background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)"
-                ),
-                
-                # Colonne 2 : Parcelles & Cultures
-                rx.card(
-                    rx.vstack(
-                        rx.heading("PARCELLES", size="4", margin_bottom="0.5em", weight="light"),
-                        parcel_item("P1 - Maïs", "12 Ha • En croissance"),
-                        parcel_item("P2 - Tomate", "4 Ha • Prêt récolte"),
-                        parcel_item("P3 - Tomate", "6 Ha • Floraison"),
-                        parcel_item("P4 - Piment", "3 Ha • Récolte en cours"),
-                        width="100%", spacing="1"
-                    ),
-                    background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)"
-                ),
-                
-                # Colonne 3 : Suivi Opérations Végétales
-                rx.card(
-                    rx.vstack(
-                        rx.heading("SUIVI OPÉRATIONS", size="4"),
-                        rx.text("AGRICULTURE", size="1", color="gray"),
-                        rx.hstack(rx.icon("chevron-left"), rx.spacer(), rx.text("Saison en cours", weight="bold"), rx.spacer(), rx.icon("chevron-right"), width="100%", padding="5px", background="#f4f6f8", border_radius="8px"),
-                        rx.box(
-                            rx.text("Rendement optimal", color="#1a4d44", weight="bold", size="2"),
-                            height="110px", background="#e8f5e9", border_radius="10px", width="100%", display="flex", align_items="center", justify_content="center"
-                        ),
-                        rx.button("NOUVELLE OPÉRATION +", background="#1a4d44", color="white", width="100%", radius="full", font_weight="bold"),
-                        width="100%", spacing="3"
-                    ),
-                    background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)"
-                ),
-                columns="3", spacing="4", width="100%"
-            ),
-            
-            # Bloc Commandes Clients / Traçabilité en bas
-            rx.card(
-                rx.hstack(
-                    rx.vstack(
-                        rx.heading("DERNIÈRES COMMANDES CLIENTS", size="4"),
-                        rx.hstack(
-                            rx.badge("Client: Restaurant Le Palmier - 10 Alvéoles", color_scheme="blue", variant="soft"),
-                            rx.badge("Client: Marché Central - 25 Kg Tomates", color_scheme="green", variant="soft"),
-                            spacing="3"
-                        ),
-                        align="start", spacing="2"
-                    ),
-                    rx.spacer(),
-                    rx.button("VOIR TOUTES LES COMMANDES", background="#1a4d44", color="white", radius="full", font_weight="lite"),
-                    width="100%", align="center"
-                ),
-                background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)", padding="1.5em"
-            ),
-            
-            width="100%", align="start", spacing="5"
-        )
-    )
+            is_first = self.check_is_setup()
+            assigned_role = "superadmin" if is_first else "client"
+
+            new_user = User(
+                nom_prenom=self.reg_nom_prenom,
+                email=self.reg_email,
+                password_hash=self.reg_password,
+                telephone=self.reg_telephone,
+                role=assigned_role
+            )
+            session.add(new_user)
+            session.commit()
+        
+        self.reg_error = ""
+        self.reg_success = "Compte créé avec succès !"
+        return rx.redirect("/admin")
+
+    @rx.event
+    async def login(self):
+        with rx.session() as session:
+            user = session.exec(
+                sqlmodel.select(User).where(User.email == self.login_email)
+            ).first()
+
+            if user and user.password_hash == self.login_password:
+                self.is_authenticated = True
+                self.current_user_name = user.nom_prenom
+                self.current_user_email = user.email
+                self.current_user_role = user.role
+                self.login_error = ""
+                return rx.redirect("/admin")
+            else:
+                self.login_error = "Email ou mot de passe incorrect."
+
+    def logout(self):
+        self.is_authenticated = False
+        return rx.redirect("/login")
