@@ -90,7 +90,7 @@ def register() -> rx.Component:
                 border_radius="30px",
                 box_shadow="0 10px 25px rgba(0,0,0,0.15)"
             ),
-            style={"backdrop_filter": "blur(3px)"},
+            style={"backdrop_filter": "blur(1px)"},
             width="100vw", 
             height="100vh", 
             position="relative", 
