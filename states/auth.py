@@ -69,7 +69,7 @@ class AuthState(rx.State):
 
     def check_is_setup(self):
         """
-        Optionnel : Si aucun utilisateur n'existe dans la base, 
+        Si aucun utilisateur n'existe dans la base, 
         le tout premier inscrit devient automatiquement Super Admin.
         """
         with rx.session() as session:
@@ -78,7 +78,7 @@ class AuthState(rx.State):
 
     @rx.event
     async def register(self):
-        """Inscription publique standard (crée un compte client par défaut, ou superadmin si la base est vide)."""
+        """Inscription publique standard."""
         if not self.reg_nom_prenom or not self.reg_email or not self.reg_password or not self.reg_telephone:
             self.reg_error = "Veuillez remplir tous les champs du formulaire."
             self.reg_success = ""
@@ -94,33 +94,28 @@ class AuthState(rx.State):
                 self.reg_success = ""
                 return
             
-            # Si c'est le tout premier utilisateur de la plateforme, il devient Super Admin
             is_first = self.check_is_setup()
             assigned_role = "superadmin" if is_first else "client"
 
             new_user = User(
                 nom_prenom=self.reg_nom_prenom,
                 email=self.reg_email,
-                password_hash=self.reg_password,  # Pensez à hasher en production
+                password_hash=self.reg_password,
                 telephone=self.reg_telephone,
                 role=assigned_role
             )
             session.add(new_user)
             session.commit()
         
-        # Réinitialisation
         self.reg_error = ""
-        self.reg_success = "Compte créé avec succès ! Vous pouvez vous connecter."
-        self.reg_nom_prenom = ""
-        self.reg_email = ""
-        self.reg_password = ""
-        self.reg_telephone = ""
+        self.reg_success = "Compte créé avec succès !"
         
+        # Redirection explicite vers /admin
         return rx.redirect("/admin")
 
     @rx.event
     async def login(self):
-        """Connexion de l'utilisateur et stockage de son rôle en session."""
+        """Connexion de l'utilisateur."""
         with rx.session() as session:
             user = session.exec(
                 sqlmodel.select(User).where(User.email == self.login_email)
@@ -130,12 +125,10 @@ class AuthState(rx.State):
                 self.is_authenticated = True
                 self.current_user_name = user.nom_prenom
                 self.current_user_email = user.email
-                self.current_user_role = user.role  # Stocke le rôle ("superadmin", "admin", "client")
+                self.current_user_role = user.role
                 self.login_error = ""
-                self.login_email = ""
-                self.login_password = ""
                 
-                # Redirection selon le rôle
+                # Redirection vers /admin si admin, sinon page d'accueil ou autre
                 if user.role in ["superadmin", "admin"]:
                     return rx.redirect("/admin")
                 else:
@@ -145,15 +138,12 @@ class AuthState(rx.State):
 
     @rx.event
     async def create_admin_by_superadmin(self):
-        """Fonctionnalité accessible UNIQUEMENT par le Super Admin pour ajouter un nouvel Administrateur."""
         if self.current_user_role != "superadmin":
-            self.admin_error = "Action non autorisée. Réservé au Super Administrateur."
-            self.admin_success = ""
+            self.admin_error = "Action non autorisée."
             return
 
         if not self.new_admin_nom or not self.new_admin_email or not self.new_admin_password or not self.new_admin_telephone:
-            self.admin_error = "Veuillez remplir tous les champs pour créer l'administrateur."
-            self.admin_success = ""
+            self.admin_error = "Veuillez remplir tous les champs."
             return
 
         with rx.session() as session:
@@ -163,7 +153,6 @@ class AuthState(rx.State):
 
             if existing:
                 self.admin_error = "Cet email est déjà utilisé."
-                self.admin_success = ""
                 return
 
             new_admin = User(
@@ -171,22 +160,21 @@ class AuthState(rx.State):
                 email=self.new_admin_email,
                 password_hash=self.new_admin_password,
                 telephone=self.new_admin_telephone,
-                role="admin"  # Forcé au rôle "admin"
+                role="admin"
             )
             session.add(new_admin)
             session.commit()
 
         self.admin_error = ""
-        self.admin_success = f"L'administrateur {self.new_admin_nom} a été créé avec succès !"
+        self.admin_success = "Administrateur créé avec succès !"
         self.new_admin_nom = ""
         self.new_admin_email = ""
         self.new_admin_password = ""
         self.new_admin_telephone = ""
 
     def logout(self):
-        """Déconnexion complète."""
         self.is_authenticated = False
         self.current_user_name = ""
         self.current_user_email = ""
         self.current_user_role = ""
-        return rx.redirect("/")
+        return rx.redirect("/login")

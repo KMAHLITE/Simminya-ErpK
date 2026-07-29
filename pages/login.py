@@ -4,7 +4,6 @@ from states.auth import AuthState
 @rx.page(route="/login", title="AGUIFERME - Connexion")
 def login() -> rx.Component:
     return rx.box(
-        # Arrière-plan avec image et effet visuel
         rx.box(
             position="absolute", 
             width="100vw", 
@@ -21,7 +20,6 @@ def login() -> rx.Component:
                     rx.image(src="/logo.png", width="100px", height="80px"),
                     rx.heading("Connexion", size="7", color="#1a4d44", weight="light"),
                     
-                    # Affichage des erreurs de connexion du AuthState
                     rx.cond(
                         AuthState.login_error != "",
                         rx.text(AuthState.login_error, color="red", size="2")

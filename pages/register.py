@@ -4,7 +4,6 @@ from states.auth import AuthState
 @rx.page(route="/register", title="AGUIFERME - Inscription")
 def register() -> rx.Component:
     return rx.box(
-        # Arrière-plan avec image et effet visuel
         rx.box(
             position="absolute", 
             width="100vw", 
@@ -21,7 +20,6 @@ def register() -> rx.Component:
                     rx.image(src="/logo.png", width="100px", height="80px"),
                     rx.heading("Inscription", size="7", color="#1a4d44", weight="light"),
                     
-                    # Affichage des erreurs et succès d'inscription
                     rx.cond(
                         AuthState.reg_error != "",
                         rx.text(AuthState.reg_error, color="red", size="2")
