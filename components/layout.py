@@ -13,8 +13,8 @@ class MenuState(rx.State):
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
     return rx.link(
         rx.hstack(
-            rx.icon(tag=icon, size=20),
-            rx.text(text, size="3"),
+            rx.icon(tag=icon, size=30),
+            rx.text(text, size="3", weight="light"),
             spacing="3", padding="10px", color="white",
         ),
         href=href, width="100%",
@@ -26,7 +26,7 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
         rx.cond(
             MenuState.is_menu_open,
             rx.vstack(
-                rx.hstack(rx.image(src="/logo.png", width="35px"), rx.heading("SIMMINYA", size="5", color="white", weight="light")),
+                rx.hstack(rx.image(src="/logo.png", width="25px"), rx.heading("SIMMINYA", size="5", color="white", weight="light")),
                 rx.divider(color="rgba(255,255,255,0.5)", margin_y="0.75em", box_shadow="0 5px 10px rgba(0,0,0,0.15)"),
                 
                 sidebar_item("Tableau de bord", "layout-dashboard", "/admin"),
@@ -37,7 +37,7 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                     rx.button(
                         rx.hstack(
                             rx.icon(tag="sprout", size=20), 
-                            rx.text("Agriculture", size="3"), 
+                            rx.text("Agriculture", size="3", weight="light"), 
                             rx.spacer(), 
                             rx.icon(tag="chevron-down", size=16),
                             spacing="3", width="100%", color="white", align="center"
