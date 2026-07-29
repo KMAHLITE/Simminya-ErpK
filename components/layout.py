@@ -14,7 +14,7 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
     return rx.link(
         rx.hstack(
             rx.icon(tag=icon, size=30),
-            rx.text(text, size="3", weight="light"),
+            rx.text(text, size="3", weight="regular"),
             spacing="3", padding="10px", color="white",
         ),
         href=href, width="100%",
@@ -37,7 +37,7 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                     rx.button(
                         rx.hstack(
                             rx.icon(tag="sprout", size=20), 
-                            rx.text("Agriculture", size="3", weight="light"), 
+                            rx.text("Agriculture", size="3", weight="regular"), 
                             rx.spacer(), 
                             rx.icon(tag="chevron-down", size=16),
                             spacing="3", width="100%", color="white", align="center"
