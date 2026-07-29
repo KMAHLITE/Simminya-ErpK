@@ -40,7 +40,7 @@ def parcel_item(name: str, stock_info: str) -> rx.Component:
 def admin_page():
     return dashboard_layout(
         rx.vstack(
-            rx.text("Tableau de bord - AGUIFERME", size="4", color="gray", weight="light"),
+            rx.text("Tableau de bord - SIMMINYA", size="4", color="gray", weight="light"),
             
             # Grille KPI adaptée aux œufs, légumes et commandes
             rx.grid(
@@ -56,18 +56,18 @@ def admin_page():
                 # Colonne 1 : Gestion Rapide des Prix & Catalogue
                 rx.card(
                     rx.vstack(
-                        rx.heading("TARIFS DU JOUR", size="4", margin_bottom="0.5em", weight="light"),
+                        rx.heading("TARIFS DU JOUR", size="4", margin_bottom="0.5em", weight="normal"),
                         rx.input(placeholder="Rechercher un produit...", width="100%", radius="full", variant="surface"),
                         rx.hstack(
                             rx.text("Alvéole d'œufs (30 œufs)", size="2", weight="medium"),
                             rx.spacer(),
-                            rx.badge("4.500 GNF", color_scheme="green", variant="solid"),
+                            rx.badge("65 000 GNF", color_scheme="green", variant="solid"),
                             width="100%", padding="8px 0", border_bottom="1px solid #f0f0f0"
                         ),
                         rx.hstack(
                             rx.text("Tomate (1 kg)", size="2", weight="medium"),
                             rx.spacer(),
-                            rx.badge("8.000 GNF", color_scheme="green", variant="solid"),
+                            rx.badge("25 000 GNF", color_scheme="green", variant="soft"),
                             width="100%", padding="8px 0", border_bottom="1px solid #f0f0f0"
                         ),
                         rx.hstack(
