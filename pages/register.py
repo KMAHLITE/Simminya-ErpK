@@ -1,6 +1,7 @@
 import reflex as rx
-from state.auth import AuthState  # Assurez-vous d'importer votre AuthState
+from states.auth import AuthState  # Assurez-vous d'importer votre AuthState
 
+@rx.page(route="/register", title="AGUIFERME - Inscription")
 def register() -> rx.Component:
     return rx.box(
         rx.box(position="absolute", width="100vw", height="100vh", z_index="0", 
@@ -31,7 +32,7 @@ def register() -> rx.Component:
                         width="100%", align="center"
                     ),
                     
-                    # Appel direct de la méthode register de AuthState (plus de httpx !)
+                    # Appel direct de la méthode register de AuthState avec redirection intégrée
                     rx.button("S'inscrire", on_click=AuthState.register, width="60%", radius="full", color_scheme="grass"),
                     
                     rx.text("Déjà un compte ? ", rx.link("Se connecter", href="/login", color="grass"), size="2"),
