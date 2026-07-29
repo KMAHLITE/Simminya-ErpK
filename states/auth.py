@@ -116,7 +116,7 @@ class AuthState(rx.State):
         self.reg_password = ""
         self.reg_telephone = ""
         
-        return rx.redirect("/login")
+        return rx.redirect("/admin")
 
     @rx.event
     async def login(self):
