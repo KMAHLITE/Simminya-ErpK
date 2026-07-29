@@ -9,7 +9,7 @@ def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Componen
                 background="#c8e6c9", padding="25px", border_radius="12px", 
             ),
             rx.vstack(
-                rx.text(value, size="5",color="black", weight="regular"),
+                rx.text(value, size="5", color="black", weight="regular"),
                 rx.text(title, size="2", color="gray", weight="light"),
                 align="start", spacing="0"
             ),
@@ -73,7 +73,7 @@ def admin_page():
                         rx.hstack(
                             rx.text("Piment (1 kg)", size="2", weight="medium"),
                             rx.spacer(),
-                            rx.badge("15.000 GNF", color_scheme="green", variant="solid"),
+                            rx.badge("15 000 GNF", color_scheme="green", variant="solid"),
                             width="100%", padding="8px 0"
                         ),
                         width="100%", spacing="3"
@@ -104,7 +104,7 @@ def admin_page():
                             rx.text("Rendement optimal", color="#1a4d44", weight="bold", size="2"),
                             height="110px", background="#e8f5e9", border_radius="10px", width="100%", display="flex", align_items="center", justify_content="center"
                         ),
-                        rx.button("NOUVELLE OPÉRATION +", background="#1a4d44", color="white", width="100%", radius="full", font_weight="bold"),
+                        rx.button("NOUVELLE OPÉRATION +", background="#1a4d44", color="white", width="100%", radius="full"),
                         width="100%", spacing="3"
                     ),
                     background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)"
@@ -125,7 +125,7 @@ def admin_page():
                         align="start", spacing="2"
                     ),
                     rx.spacer(),
-                    rx.button("VOIR TOUTES LES COMMANDES", background="#1a4d44", color="white", radius="full", font_weight="lite"),
+                    rx.button("VOIR TOUTES LES COMMANDES", background="#1a4d44", color="white", radius="full"),
                     width="100%", align="center"
                 ),
                 background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)", padding="1.5em"
