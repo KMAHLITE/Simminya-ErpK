@@ -9,7 +9,7 @@ def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Componen
                 background="#c8e6c9", padding="15px", border_radius="12px", 
             ),
             rx.vstack(
-                rx.text(value, size="5", weight="bold"),
+                rx.text(value, size="5",color="black" weight="bold"),
                 rx.text(title, size="2", color="gray"),
                 align="start", spacing="0"
             ),
