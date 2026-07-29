@@ -12,7 +12,7 @@ def login() -> rx.Component:
             background_image="url('/logo.png')", 
             background_size="cover", 
             background_position="center", 
-            opacity="0.75"
+            opacity="0.25"
         ),
         rx.center(
             rx.card(
