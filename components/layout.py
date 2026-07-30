@@ -13,7 +13,7 @@ class MenuState(rx.State):
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
     return rx.link(
         rx.hstack(
-            rx.icon(tag=icon, size=10),
+            rx.icon(tag=icon, size=20),
             rx.text(text, size="3", weight="regular"),
             spacing="3", padding="10px", color="white",
         ),
