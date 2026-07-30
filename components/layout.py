@@ -72,7 +72,7 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                     variant=rx.cond(MenuState.is_menu_open, "solid", "ghost")
                 ),
                 rx.spacer(),
-                rx.avatar(fallback="AF", size="2", margin_right="1em", border_radius="50px", box_shadow="0 2px 5px rgba(0,0,0,0.15)", border="2px solid #1a4d44"),
+                rx.avatar(fallback="AF", size="2", margin_right="1em", border_radius="50px", border="1px solid #1a4d44"),
                 width="100%", padding="1em", border_bottom="1px solid #e0e0e0", border_radius="10px", box_shadow="0 2px 5px rgba(0,0,0,0.15)"
             ),
             rx.box(content, width="100%", padding="2em", overflow_y="auto"),
