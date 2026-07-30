@@ -5,8 +5,8 @@ def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Componen
     return rx.card(
         rx.hstack(
             rx.box(
-                rx.icon(tag=icon, color="#1a4d44", size=24),
-                background="#c8e6c9", padding="20px", border_radius="12px", 
+                rx.icon(tag=icon, color="#1a4d44", size=15),
+                background="#c8e6c9", padding="15px", border_radius="12px", 
             ),
             rx.vstack(
                 rx.text(value, size="5", color="black", weight="regular"),
@@ -48,7 +48,7 @@ def admin_page():
                 kpi_card("Stock Légumes", "320 Kg", "carrot", "Prix"),
                 kpi_card("Commandes Clients", "8 en attente", "shopping-cart", "Traiter"),
                 kpi_card("Chiffre d'Affaires", "1.250.000 GNF", "trending-up", "Détails"),
-                columns="4", spacing="4", width="110%"
+                columns="4", spacing="4", width="100%"
             ),
             
             # Grille Centrale (Recherche/Catalogue + Parcelles + Suivi des Opérations)
