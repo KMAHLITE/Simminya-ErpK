@@ -14,7 +14,7 @@ def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Componen
                 align="start", spacing="0"
             ),
             rx.spacer(),
-            rx.badge(action_text, color_scheme="green", variant="soft", cursor="pointer"),
+            rx.badge(action_text, color_scheme="green", variant="outline", cursor="pointer"),
             spacing="4", align="center"
         ),
         background="white", width="100%", border_radius="15px",
