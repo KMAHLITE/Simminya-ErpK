@@ -6,7 +6,7 @@ def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Componen
         rx.hstack(
             rx.box(
                 rx.icon(tag=icon, color="#1a4d44", size=24),
-                background="#c8e6c9", padding="25px", border_radius="12px", 
+                background="#c8e6c9", padding="20px", border_radius="12px", 
             ),
             rx.vstack(
                 rx.text(value, size="5", color="black", weight="regular"),
