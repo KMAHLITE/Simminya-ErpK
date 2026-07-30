@@ -48,7 +48,7 @@ def admin_page():
                 kpi_card("Stock Légumes", "320 Kg", "carrot", "Prix"),
                 kpi_card("Commandes Clients", "8 en attente", "shopping-cart", "Traiter"),
                 kpi_card("Chiffre d'Affaires", "1.250.000 GNF", "trending-up", "Détails"),
-                columns="4", spacing="4", width="100%"
+                columns="4", spacing="4", width="110%"
             ),
             
             # Grille Centrale (Recherche/Catalogue + Parcelles + Suivi des Opérations)
