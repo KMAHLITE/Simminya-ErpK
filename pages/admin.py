@@ -40,7 +40,7 @@ def parcel_item(name: str, stock_info: str) -> rx.Component:
 def admin_page():
     return dashboard_layout(
         rx.vstack(
-            rx.text("Tableau de bord - SIMMINYA", size="4", color="gray", weight="light"),
+            rx.text("Tableau de bord ", size="4", color="gray", weight="light"),
             
             # Grille KPI adaptée aux œufs, légumes et commandes
             rx.grid(
@@ -67,7 +67,7 @@ def admin_page():
                         rx.hstack(
                             rx.text("Tomate (1 kg)", size="2", weight="medium"),
                             rx.spacer(),
-                            rx.badge("25 000 GNF", color_scheme="green", variant="soft"),
+                            rx.badge("25 000 GNF", color_scheme="green", variant="solid"),
                             width="100%", padding="8px 0", border_bottom="1px solid #f0f0f0"
                         ),
                         rx.hstack(
