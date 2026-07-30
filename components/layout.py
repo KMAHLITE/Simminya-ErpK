@@ -13,7 +13,7 @@ class MenuState(rx.State):
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
     return rx.link(
         rx.hstack(
-            rx.icon(tag=icon, size=30),
+            rx.icon(tag=icon, size=10),
             rx.text(text, size="3", weight="regular"),
             spacing="3", padding="10px", color="white",
         ),
@@ -73,7 +73,7 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                 ),
                 rx.spacer(),
                 rx.avatar(fallback="AF", size="2", margin_right="1em", border_radius="50px", border="1px solid #1a4d44"),
-                width="100%", padding="1em", border_bottom="1px solid #e0e0e0", border_radius="10px", box_shadow="0 2px 5px rgba(0,0,0,0.15)", border="1px solid #1a4d44"
+                width="100%", padding="1em", border_bottom="1px solid #e0e0e0", border_radius="10px", box_shadow="0 2px 5px rgba(0,0,0,0.15)", border="2px solid #1a4d44"
             ),
             rx.box(content, width="100%", padding="2em", overflow_y="auto"),
             width="100%", background="#f4f6f8", height="100vh", spacing="0"

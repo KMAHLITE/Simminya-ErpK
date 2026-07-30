@@ -20,7 +20,7 @@ def kpi_card(title: str, value: str, icon: str, action_text: str) -> rx.Componen
         background="white", width="100%", border_radius="15px",
         box_shadow="0 10px 20px rgba(0,0,0,0.15)", 
         transition="transform 0.2s",
-        _hover={"transform": "translateY(-5px)"}
+        _hover={"transform": "translateY(-5px)"}, border="2px solid #1a4d44"
     )
 
 def parcel_item(name: str, stock_info: str) -> rx.Component:
