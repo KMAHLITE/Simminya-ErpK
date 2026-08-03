@@ -1,16 +1,39 @@
 import reflex as rx
+import time
 from components.layout import dashboard_layout
 
 class AdminState(rx.State):
-    """État pour gérer l'interactivité de la page admin (chevron dynamique AGRICULTURE)."""
+    """État pour gérer l'interactivité, l'authentification et l'inactivité de la page admin."""
     agriculture_index: int = 0
+    
+    # Sécurité & Session
+    is_authenticated: bool = True  # À lier à votre système de connexion réel
+    last_activity_time: float = time.time()
+
+    def check_session(self):
+        """Vérifie l'authentification et déconnecte l'utilisateur après 15 minutes (900s) d'inactivité."""
+        TIMEOUT_LIMIT = 900  # 15 minutes
+        current_time = time.time()
+
+        if not self.is_authenticated:
+            return rx.redirect("/login")
+
+        if (current_time - self.last_activity_time) > TIMEOUT_LIMIT:
+            self.is_authenticated = False
+            return rx.redirect("/login")
+
+        self.last_activity_time = current_time
+
+    def update_activity(self):
+        """Met à jour le compteur d'activité à chaque action."""
+        self.last_activity_time = time.time()
 
     def next_season(self):
-        """Passe à la saison ou vue suivante lors du clic sur le chevron droit."""
+        self.update_activity()
         self.agriculture_index = (self.agriculture_index + 1) % 3
 
     def prev_season(self):
-        """Passe à la saison ou vue précédente lors du clic sur le chevron gauche."""
+        self.update_activity()
         self.agriculture_index = (self.agriculture_index - 1) % 3
 
 
@@ -49,13 +72,16 @@ def parcel_item(name: str, stock_info: str) -> rx.Component:
         _hover={"background": "#f9f9f9", "border_radius": "8px"}, cursor="pointer"
     )
 
-@rx.page(route="/admin")
+@rx.page(
+    route="/admin",
+    on_load=AdminState.check_session  # Sécurité : vérifie l'accès et le timeout dès l'ouverture/rechargement
+)
 def admin_page():
     return dashboard_layout(
         rx.vstack(
             rx.text("Tableau de bord ", size="4", color="gray", weight="light"),
             
-            # Grille KPI responsive corrigée avec un dictionnaire de breakpoints
+            # Grille KPI responsive
             rx.grid(
                 kpi_card("Alvéoles d'Œufs", "145 Alv.", "egg", "Gérer"),
                 kpi_card("Stock Légumes", "320 Kg", "carrot", "Prix"),
@@ -66,7 +92,7 @@ def admin_page():
                 width="100%"
             ),
             
-            # Grille Centrale responsive corrigée avec un dictionnaire
+            # Grille Centrale responsive
             rx.grid(
                 # Colonne 1 : Gestion Rapide des Prix & Catalogue
                 rx.card(
