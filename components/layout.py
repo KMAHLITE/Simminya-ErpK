@@ -27,27 +27,14 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
 def dashboard_layout(content: rx.Component) -> rx.Component:
     return rx.box(
         rx.flex(
-            # Overlay sombre uniquement sur mobile lorsque le menu tiroir est ouvert
-            rx.cond(
-                MenuState.is_menu_open,
-                rx.box(
-                    position="fixed", top="0", left="0", width="100vw", height="100vh",
-                    background="rgba(10, 25, 20, 0.6)", z_index="998",
-                    backdrop_filter="blur(4px)",
-                    on_click=MenuState.close_menu,
-                    display={"initial": "block", "md": "none"}
-                ),
-                rx.fragment()
-            ),
-
-            # Sidebar : Tiroir glissant sur mobile (95%), Colonne fixe classique sur Desktop
+            # Menu de navigation / Sidebar (Plein écran superposé sur mobile, fixe classique sur Desktop)
             rx.box(
                 rx.vstack(
                     rx.hstack(
                         rx.image(src="/logo.png", width="30px"), 
                         rx.heading("AGUIFERME", size="5", color="white", weight="bold", letter_spacing="1px"),
                         rx.spacer(),
-                        # Bouton de fermeture 'x' affiché uniquement sur mobile à l'intérieur du tiroir
+                        # Bouton 'x' visible uniquement sur mobile dans le menu ouvert pour le refermer
                         rx.button(
                             rx.icon("x", size=22, color="white"), 
                             on_click=MenuState.close_menu, 
@@ -64,7 +51,7 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                     sidebar_item("Tableau de bord", "layout-dashboard", "/admin"),
                     sidebar_item("Ferme", "building-2", "/admin/ferme"),
                     
-                    # Section Agriculture avec chevron dynamique (pointe vers la droite par défaut, vers le bas si ouvert)
+                    # Section Agriculture avec chevron dynamique
                     rx.vstack(
                         rx.button(
                             rx.hstack(
@@ -101,33 +88,36 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                 top="0",
                 left="0",
                 height="100vh",
-                width={"initial": "95%", "sm": "320px", "md": "280px"},
-                max_width={"initial": "340px", "md": "none"},
+                width={"initial": "100vw", "md": "280px"},
                 background="linear-gradient(180deg, #113832 0%, #0c2824 100%)", 
                 padding="2em 1.5em",
                 z_index="999",
-                transition="transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+                transition="transform 0.3s ease-in-out",
                 transform=rx.cond(
                     MenuState.is_menu_open,
                     "translateX(0)",
                     {"initial": "translateX(-100%)", "md": "translateX(0)"}
                 ),
-                box_shadow={"initial": "10px 0 30px rgba(0,0,0,0.5)", "md": "none"}
+                box_shadow={"initial": "none", "md": "none"}
             ),
 
             # Contenu principal de la page
             rx.vstack(
                 rx.hstack(
-                    # Bouton Hamburger visible uniquement sur mobile pour déclencher l'ouverture du tiroir
-                    rx.button(
-                        rx.icon(tag="menu", size=22, color="#113832"),
-                        on_click=MenuState.toggle_menu,
-                        background="white",
-                        border="1px solid #e0e0e0",
-                        border_radius="10px",
-                        box_shadow="0 2px 5px rgba(0,0,0,0.05)",
-                        variant="solid",
-                        display={"initial": "flex", "md": "none"}
+                    # Bouton Hamburger visible uniquement sur mobile lorsque le menu est fermé
+                    rx.cond(
+                        ~MenuState.is_menu_open,
+                        rx.button(
+                            rx.icon(tag="menu", size=22, color="#113832"),
+                            on_click=MenuState.toggle_menu,
+                            background="white",
+                            border="1px solid #e0e0e0",
+                            border_radius="10px",
+                            box_shadow="0 2px 5px rgba(0,0,0,0.05)",
+                            variant="solid",
+                            display={"initial": "flex", "md": "none"}
+                        ),
+                        rx.fragment()
                     ),
                     rx.spacer(),
                     rx.hstack(
