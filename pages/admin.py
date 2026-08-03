@@ -3,7 +3,6 @@ from components.layout import dashboard_layout
 
 class AdminState(rx.State):
     """État pour gérer l'interactivité de la page admin (chevron dynamique AGRICULTURE)."""
-    # Index ou état pour faire basculer dynamiquement le contenu ou l'affichage de l'onglet agriculture
     agriculture_index: int = 0
 
     def next_season(self):
@@ -56,16 +55,18 @@ def admin_page():
         rx.vstack(
             rx.text("Tableau de bord ", size="4", color="gray", weight="light"),
             
-            # Grille KPI adaptée responsive (colonnes fluides selon l'écran)
+            # Grille KPI responsive corrigée avec un dictionnaire de breakpoints
             rx.grid(
                 kpi_card("Alvéoles d'Œufs", "145 Alv.", "egg", "Gérer"),
                 kpi_card("Stock Légumes", "320 Kg", "carrot", "Prix"),
                 kpi_card("Commandes Clients", "8 en attente", "shopping-cart", "Traiter"),
                 kpi_card("Chiffre d'Affaires", "1.250.000 GNF", "trending-up", "Détails"),
-                columns=["1", "2", "2", "4"], spacing="4", width="100%"
+                columns={"initial": "1", "sm": "2", "md": "2", "lg": "4"}, 
+                spacing="4", 
+                width="100%"
             ),
             
-            # Grille Centrale responsive (passe de 3 colonnes sur grand écran à 1 colonne sur mobile)
+            # Grille Centrale responsive corrigée avec un dictionnaire
             rx.grid(
                 # Colonne 1 : Gestion Rapide des Prix & Catalogue
                 rx.card(
@@ -152,10 +153,12 @@ def admin_page():
                     ),
                     background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)"
                 ),
-                columns=["1", "1", "3"], spacing="4", width="100%"
+                columns={"initial": "1", "md": "3"}, 
+                spacing="4", 
+                width="100%"
             ),
             
-            # Bloc Commandes Clients / Traçabilité en bas (Responsive empilé sur mobile)
+            # Bloc Commandes Clients / Traçabilité en bas
             rx.card(
                 rx.flex(
                     rx.vstack(
@@ -163,14 +166,14 @@ def admin_page():
                         rx.flex(
                             rx.badge("Client: Restaurant Le Palmier - 10 Alvéoles", color_scheme="blue", variant="soft"),
                             rx.badge("Client: Marché Central - 25 Kg Tomates", color_scheme="green", variant="soft"),
-                            direction=["column", "row"],
+                            direction={"initial": "column", "sm": "row"},
                             spacing="3"
                         ),
                         align="start", spacing="2"
                     ),
                     rx.spacer(),
-                    rx.button("VOIR TOUTES LES COMMANDES", background="#1a4d44", color="white", radius="full", width=["100%", "auto"]),
-                    direction=["column", "row"],
+                    rx.button("VOIR TOUTES LES COMMANDES", background="#1a4d44", color="white", radius="full", width={"initial": "100%", "sm": "auto"}),
+                    direction={"initial": "column", "sm": "row"},
                     width="100%", align="center", spacing="4"
                 ),
                 background="white", border_radius="15px", width="100%", box_shadow="0 5px 15px rgba(0,0,0,0.05)", padding="1.5em"
