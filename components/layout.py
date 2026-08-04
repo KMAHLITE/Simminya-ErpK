@@ -2,7 +2,7 @@ import reflex as rx
 
 class MenuState(rx.State):
     is_agriculture_open: bool = False
-    is_menu_open: bool = False
+    is_menu_open: bool = False  # Fermé par défaut sur mobile pour ne pas encombrer
 
     def toggle_menu(self):
         self.is_menu_open = not self.is_menu_open
@@ -16,7 +16,7 @@ class MenuState(rx.State):
 def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
     return rx.link(
         rx.hstack(
-            rx.icon(tag=icon, size=20, color="#d4af37"),
+            rx.icon(tag=icon, size=20, color="#d4af37"),  # Touche de doré luxueux
             rx.text(text, size="2", weight="medium", color="#f8f9fa"),
             spacing="3", padding="12px 16px", width="100%",
         ),
@@ -27,14 +27,27 @@ def sidebar_item(text: str, icon: str, href: str) -> rx.Component:
 def dashboard_layout(content: rx.Component) -> rx.Component:
     return rx.box(
         rx.flex(
-            # Menu de navigation / Sidebar (Plein écran superposé sur mobile, fixe classique sur Desktop)
+            # Overlay sombre de fond sur mobile uniquement quand le menu tiroir est ouvert
+            rx.cond(
+                MenuState.is_menu_open,
+                rx.box(
+                    position="fixed", top="0", left="0", width="100vw", height="100vh",
+                    background="rgba(10, 25, 20, 0.6)", z_index="998",
+                    backdrop_filter="blur(4px)",
+                    on_click=MenuState.close_menu,
+                    display={"initial": "block", "md": "none"}
+                ),
+                rx.fragment()
+            ),
+
+            # Sidebar / Menu Tiroir (95% sur mobile, fixe élégant sur desktop)
             rx.box(
                 rx.vstack(
                     rx.hstack(
                         rx.image(src="/logo.png", width="30px"), 
                         rx.heading("AGUIFERME", size="5", color="white", weight="bold", letter_spacing="1px"),
                         rx.spacer(),
-                        # Bouton 'x' visible uniquement sur mobile dans le menu ouvert pour le refermer
+                        # Bouton de fermeture 'x' affiché uniquement sur mobile lorsque le menu est ouvert
                         rx.button(
                             rx.icon("x", size=22, color="white"), 
                             on_click=MenuState.close_menu, 
@@ -51,18 +64,14 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                     sidebar_item("Tableau de bord", "layout-dashboard", "/admin"),
                     sidebar_item("Ferme", "building-2", "/admin/ferme"),
                     
-                    # Section Agriculture avec chevron dynamique
+                    # Section Agriculture avec sous-menu
                     rx.vstack(
                         rx.button(
                             rx.hstack(
                                 rx.icon(tag="sprout", size=20, color="#d4af37"), 
                                 rx.text("Agriculture", size="2", weight="medium", color="white"), 
                                 rx.spacer(), 
-                                rx.icon(
-                                    tag=rx.cond(MenuState.is_agriculture_open, "chevron-down", "chevron-right"), 
-                                    size=16, 
-                                    color="white"
-                                ),
+                                rx.icon(tag="chevron-down", size=16, color="white"),
                                 spacing="3", width="100%", align="center"
                             ),
                             on_click=MenuState.toggle_agriculture, 
@@ -84,40 +93,38 @@ def dashboard_layout(content: rx.Component) -> rx.Component:
                     rx.spacer(),
                     width="100%", height="100%",
                 ),
+                # Comportement Responsive : Glissement tiroir sur mobile, statique sur grand écran
                 position={"initial": "fixed", "md": "sticky"},
                 top="0",
                 left="0",
                 height="100vh",
-                width={"initial": "100vw", "md": "280px"},
+                width={"initial": "95%", "sm": "320px"},
+                max_width="340px",
                 background="linear-gradient(180deg, #113832 0%, #0c2824 100%)", 
                 padding="2em 1.5em",
                 z_index="999",
-                transition="transform 0.3s ease-in-out",
+                transition="transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
                 transform=rx.cond(
                     MenuState.is_menu_open,
                     "translateX(0)",
                     {"initial": "translateX(-100%)", "md": "translateX(0)"}
                 ),
-                box_shadow={"initial": "none", "md": "none"}
+                box_shadow={"initial": "10px 0 30px rgba(0,0,0,0.5)", "md": "none"}
             ),
 
             # Contenu principal de la page
             rx.vstack(
                 rx.hstack(
-                    # Bouton Hamburger visible uniquement sur mobile lorsque le menu est fermé
-                    rx.cond(
-                        ~MenuState.is_menu_open,
-                        rx.button(
-                            rx.icon(tag="menu", size=22, color="#113832"),
-                            on_click=MenuState.toggle_menu,
-                            background="white",
-                            border="1px solid #e0e0e0",
-                            border_radius="10px",
-                            box_shadow="0 2px 5px rgba(0,0,0,0.05)",
-                            variant="solid",
-                            display={"initial": "flex", "md": "none"}
-                        ),
-                        rx.fragment()
+                    # Bouton Hamburger visible uniquement sur mobile pour ouvrir le menu
+                    rx.button(
+                        rx.icon(tag="menu", size=22, color="#113832"),
+                        on_click=MenuState.toggle_menu,
+                        background="white",
+                        border="1px solid #e0e0e0",
+                        border_radius="10px",
+                        box_shadow="0 2px 5px rgba(0,0,0,0.05)",
+                        variant="solid",
+                        display={"initial": "flex", "md": "none"}
                     ),
                     rx.spacer(),
                     rx.hstack(
