@@ -77,15 +77,14 @@ def parcel_item(name: str, stock_info: str) -> rx.Component:
 
 @rx.page(
     route="/admin",
-    on_load=AdminState.check_session  # Sécurité automatique à l'accès de la page admin[cite: 2]
+    on_load=AdminState.check_session  # Sécurité automatique à l'accès de la page admin
 )
 def admin_page():
     return dashboard_layout(
         rx.vstack(
             rx.hstack(
                 rx.vstack(
-                    rx.heading("Tableau de Bord", size="7", color="#113832", weight="bold"),
-                    rx.text("Bienvenue sur la plateforme de gestion AGUIFERME.", size="2", color="#666"),
+                    rx.heading("Tableau de Bord", size="7", color="#113832", weight="light"),
                     align="start", spacing="1"
                 ),
                 rx.spacer(),
